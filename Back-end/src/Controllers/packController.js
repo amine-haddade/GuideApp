@@ -75,7 +75,7 @@ const deletePack = asyncHandler( async (req, res) => {
     if (req.user.role.toLowerCase() !== 'guide') {
         return res.status(403).json({message: 'You don\'t seem to have the right permissions to perform this action'});
     }
-    const pack = await Pack.findByIdAndDelete(req.params.id);
+    const pack = await Pack.findOneAndDelete({_id: req.params.id, guideId: req.user.id});
 
     if (!pack) {
         return res.status(404).json({message: 'Pack not found'});
