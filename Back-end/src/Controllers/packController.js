@@ -70,6 +70,24 @@ const getPackById = asyncHandler( async (req, res) => {
     res.status(200).json(pack);
 });
 
+// Update a pack. Makes sure only the owner guides have access to the pack update.
+const updatePack = asyncHandler( async (req, res) => {
+    if (req.user.role.toLowerCase() !== 'guide') {
+        return res.status(403).json({ message: 'You don\'t seem to have the right permissions to perform this action'});
+    }
+    const updatePack = await Pack.findOneAndUpdate(
+        {_id: req.params.id, guideId: req.user.id},
+        req.body,
+        {new: true, runValidators: true}
+    );
+
+    if (!updatePack) {
+        return res.status(404).json({ message: 'Pack not found' });
+    }
+
+    res.status(200).json(updatePack)
+})
+
 // Delete a pack. Makes sure only guides have access to this controller
 const deletePack = asyncHandler( async (req, res) => {
     if (req.user.role.toLowerCase() !== 'guide') {
@@ -88,5 +106,6 @@ module.exports = [
     getAllPacks,
     createPack,
     getPackById,
+    updatePack,
     deletePack,
 ];

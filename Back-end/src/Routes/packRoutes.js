@@ -11,6 +11,7 @@ router.get('/:id', packController.getPackById);
 
 // Create and delete a pack ( only guides should have access to this route )
 router.post('/', packController.createPack);
+router.put('/:id', packController.updatePack);
 router.delete('/:id', packController.deletePack);
 
 module.exports = router;
