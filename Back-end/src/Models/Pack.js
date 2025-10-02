@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
-const { dateValidator, checkEndDate } = require('../Validations/packValidator');
+import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
+import { dateValidator, checkEndDate } from "../Validations/packValidator";
 
 const packSchema = mongoose.Schema({
     guideId: {
@@ -61,4 +62,5 @@ const packSchema = mongoose.Schema({
     }
 });
 
+packSchema.plugin(mongoosePaginate);
 module.exports = mongoose.model('Pack', packSchema);
