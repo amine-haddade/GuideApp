@@ -6,6 +6,9 @@ const router = express.Router();
 // Get all the packs. But if the user is a guide, he'll only get his packs not all the packs
 router.get('/', packController.getAllPacks);
 
+// Get a pack by its id. Make sure the guides only get access to their packs
+router.get('/:id', packController.getPackById);
+
 // Create a new pack ( only guides should have access to this route )
 router.post('/', packController.createPack);
 

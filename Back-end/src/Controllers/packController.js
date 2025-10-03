@@ -52,7 +52,23 @@ const createPack = asyncHandler( async (req, res) => {
     res.status(201).json(savedPack);
 });
 
+// Gets a pack by it's ID. Makes sure the guides only get access to their packs and not to other guides packs.
+const getPackById = asyncHandler( async (req, res) => {
+    if (req.user.role.toLowerCase() === "guide") {
+        const pack = await Pack.findOne({_id: req.params.id, guideId: req.user.id});
+    } else {
+        const pack = await Pack.findById(req.params.id);
+    }
+
+    if (!pack) {
+        return res.status(404).json({ message: 'Pack not found'});
+    }
+
+    res.status(200).json(pack);
+});
+
 module.exports = [
     getAllPacks,
     createPack,
+    getPackById,
 ];
