@@ -1,19 +1,20 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 dotenv.config();
+const uri = process.env.MONGO_URI
 
-// Create a connection to a local mongodb database
+
 const connectDB = async () => {
-    try {
-        const conn = await mongoose.connect(process.env.MONGODB_URI);
-        console.log("Connected to the database");
-    } catch (error) {
-        console.error(`Error: ${error.message}`);
-        process.exit(1);
-    }
+  try {
+    const conn = await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log(`✅ MongoDB connecté : ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`❌ Erreur de connexion MongoDB : ${error.message}`);
+    process.exit(1);
+  }
 };
 
-module.exports = {
-    port: process.env.PORT || 3000,
-    connectDB
-};
+export default connectDB;
