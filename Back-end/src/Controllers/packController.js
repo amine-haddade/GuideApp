@@ -17,8 +17,11 @@ const getAllPacks = asyncHandler( async (req, res) => {
     res.status(200).json(packs);
 });
 
-// Create a pack
+// Create a pack. Makes sure only guides have access to this controller
 const createPack = asyncHandler( async (req, res) => {
+    if (req.user.role.toLowerCase() !== 'guide') {
+        return res.status(403).json({message: 'You don\'t seem to have the right permissions to perform this action'});
+    }
     const {
         guidesPlacesId,
         title,
@@ -67,8 +70,23 @@ const getPackById = asyncHandler( async (req, res) => {
     res.status(200).json(pack);
 });
 
+// Delete a pack. Makes sure only guides have access to this controller
+const deletePack = asyncHandler( async (req, res) => {
+    if (req.user.role.toLowerCase() !== 'guide') {
+        return res.status(403).json({message: 'You don\'t seem to have the right permissions to perform this action'});
+    }
+    const pack = await Pack.findOneAndDelete({_id: req.params.id, guideId: req.user.id});
+
+    if (!pack) {
+        return res.status(404).json({message: 'Pack not found'});
+    }
+
+    res.status(202).json(pack)
+});
+
 module.exports = [
     getAllPacks,
     createPack,
     getPackById,
+    deletePack,
 ];

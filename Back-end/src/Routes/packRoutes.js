@@ -9,7 +9,8 @@ router.get('/', packController.getAllPacks);
 // Get a pack by its id. Make sure the guides only get access to their packs
 router.get('/:id', packController.getPackById);
 
-// Create a new pack ( only guides should have access to this route )
+// Create and delete a pack ( only guides should have access to this route )
 router.post('/', packController.createPack);
+router.delete('/:id', packController.deletePack);
 
 module.exports = router;
