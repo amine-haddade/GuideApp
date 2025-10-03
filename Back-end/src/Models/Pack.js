@@ -1,15 +1,17 @@
-const mongoose = require('mongoose');
-const { dateValidator, checkEndDate } = require('../Validations/packValidator');
+import mongoose from "mongoose";
+import { dateValidator, checkEndDate } from "../Validations/packValidator";
 
 const packSchema = mongoose.Schema({
     guideId: {
-        type: Number,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
-    guidesPlacesId: {
-        type: [Number],
+    guidesPlacesId: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Guide',
         required: true
-    },
+    }],
     title: {
         type: String,
         required: true
