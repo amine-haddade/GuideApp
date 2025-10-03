@@ -1,6 +1,8 @@
 // src/server.js
 import express from "express";
 import dotenv from "dotenv";
+import packRouter from "./Routes/packRoutes";
+
 import connectDB from "./Config/db.js";
 // Charger les variables d'environnement depuis .env
 dotenv.config();
@@ -18,7 +20,8 @@ app.get("/", (req, res) => {
   res.send(` Serveur lancé sur le port ${port}`);
 });
 
-
+// Routes
+app.use('/api/packs/', packRouter);
 
 // Démarrer le serveur
 app.listen(port, () => {

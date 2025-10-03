@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 import { dateValidator, checkEndDate } from "../Validations/packValidator";
 
 const packSchema = mongoose.Schema({
@@ -63,4 +64,5 @@ const packSchema = mongoose.Schema({
     }
 });
 
+packSchema.plugin(mongoosePaginate);
 module.exports = mongoose.model('Pack', packSchema);
