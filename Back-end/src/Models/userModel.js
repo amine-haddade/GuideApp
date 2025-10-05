@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, "name is required"],
-      trim: true
+      trim: true,
     },
     email: {
       type: String,
@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: [true, "phone number is required"],
-      trim: true
+      trim: true,
     },
     cin: {
       type: String,
@@ -43,10 +43,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    isDeleted: { 
+      type: Boolean, 
+      default: false 
+    },
+    deletedAt: { 
+      type: Date, 
+      default: null
+    },
   },
   { timestamps: true }
 );
 
 const User = mongoose.model("users", userSchema);
 export default User;
-

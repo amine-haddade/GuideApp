@@ -91,3 +91,9 @@ export const updateUserValidation = [
     .if(body("role").equals("guide"))
     .escape(),
 ];
+
+export const deleteManyUsersValidation = [
+  body("ids")
+    .notEmpty().withMessage("IDs are required")
+    .isArray().withMessage("IDs must be an array")
+];
