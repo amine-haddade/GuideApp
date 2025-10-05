@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
-import { dateValidator, checkEndDate } from "../Validations/packValidator";
+import { dateValidator, checkEndDate } from "../Validations/packValidator.js";
 
 const packSchema = mongoose.Schema({
     guideId: {
@@ -49,8 +49,7 @@ const packSchema = mongoose.Schema({
     },
     endLocation: {
         type: String,
-        required: true,
-        default: startLocation
+        required: true
     },
     avgRating: {
         type: Number,
@@ -63,4 +62,4 @@ const packSchema = mongoose.Schema({
 });
 
 packSchema.plugin(mongoosePaginate);
-module.exports = mongoose.model('Pack', packSchema);
+export default mongoose.model('Pack', packSchema);
