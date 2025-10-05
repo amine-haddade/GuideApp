@@ -152,4 +152,106 @@ const deleteManyUsers = async (req, res, next) => {
   }
 };
 
-export { addUser, updateUser, deleteUserById, deleteManyUsers };
+// Get all Users (Guide and Client)
+const getAllUsers = async (req, res, next) => {
+  try {
+    const { role, search, page, limit, sort, order } = req.query;
+    const normalizedRole = role ? role.toLowerCase() : null;
+
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
+    const skip = (pageNum - 1) * limitNum;
+
+    // Build sort object
+    let sortOption = {};
+    if (sort) {
+      const sortOrder = order === "desc" ? -1 : 1;
+      sortOption[sort] = sortOrder;
+    } else {
+      sortOption = { createdAt: -1 };
+    }
+
+    let query = { role: { $in: ["guide", "client"] }, isDeleted: false };
+
+    // Filter by role if provided
+    if (role) {
+      if (["guide", "client"].includes(normalizedRole)) {
+        query.role = normalizedRole;
+      } else if (normalizedRole === "admin") {
+        const error = new Error(`admin can't be showed here`);
+        error.statusCode = 400;
+        throw error;
+      } else {
+        const error = new Error(`no role as ${role}`);
+        error.statusCode = 404;
+        throw error;
+      }
+    }
+
+    // Search by name or email if provided
+    if (search) {
+      const regex = new RegExp(search, "i");
+      query.$or = [{ name: regex }, { email: regex }];
+    }
+
+    const users = await User.find(query)
+      .select("-password -refreshToken")
+      .skip(skip)
+      .limit(limitNum)
+      .sort(sortOption);
+
+    if (users.length === 0) {
+      const error = new Error("no user is found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      users,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Get user (guide or client) by ID
+const getUserById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      const error = new Error("user not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const user = await User.findOne({
+      _id: id,
+      isDeleted: false,
+    }).select("-password -refreshToken");
+
+    if (!user) {
+      const error = new Error("user not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export {
+  addUser,
+  updateUser,
+  deleteUserById,
+  deleteManyUsers,
+  getAllUsers,
+  getUserById,
+};
