@@ -3,7 +3,7 @@ import GuidePlace from "../Models/Guide.js";
 import fs from "fs";
 import path from "path";
 
-// ✅ Créer un lieu avec upload
+// Créer un lieu avec upload
 export const createGuidePlace = async (req, res) => {
   try {
     //  Récupérer les noms des images uploadées
@@ -19,9 +19,9 @@ export const createGuidePlace = async (req, res) => {
     };
 
     const newPlace = await GuidePlace.create(data);
-    res.status(201).json({ message: "Lieu créé avec succès ✅", data: newPlace });
+    res.status(201).json({ message: "Lieu créé avec succès ", data: newPlace });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur ❌", error: error.message });
+    res.status(500).json({ message: "Erreur serveur ", error: error.message });
   }
 };
 
@@ -49,21 +49,47 @@ export const getGuidePlaceById = async (req, res) => {
 //  Mettre à jour un lieu (avec images optionnelles)
 export const updateGuidePlace = async (req, res) => {
   try {
-    let updatedData = { ...req.body };
-
-    if (req.files && req.files.length > 0) {
-      updatedData.images = req.files.map((file) => file.filename);
+    // 1. Récupérer le lieu existant
+    const existingPlace = await GuidePlace.findById(req.params.id);
+    if (!existingPlace) {
+      return res.status(404).json({ message: "Lieu non trouvé" });
     }
 
-    const updated = await GuidePlace.findByIdAndUpdate(req.params.id, updatedData, {
-      new: true,
-      runValidators: true,
-    });
+    let updatedData = { ...req.body };
 
-    if (!updated) return res.status(404).json({ message: "Lieu non trouvé ❌" });
-    res.json({ message: "Lieu mis à jour ", data: updated });
+    // 2. Si de nouvelles images sont téléchargées
+    if (req.files && req.files.length > 0) {
+      // Supprimer les anciennes images
+      existingPlace.images.forEach(img => {
+        const filePath = path.resolve("uploads", img);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      });
+
+      // Ajouter les nouvelles images
+      updatedData.images = req.files.map(file => file.filename);
+    }
+
+    // 3. Mettre à jour le document
+    const updated = await GuidePlace.findByIdAndUpdate(
+      req.params.id,
+      updatedData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    res.json({ 
+      message: "Lieu mis à jour avec succès",
+      data: updated 
+    });
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error: error.message });
+    res.status(500).json({ 
+      message: "Erreur serveur", 
+      error: error.message 
+    });
   }
 };
 
@@ -71,7 +97,7 @@ export const updateGuidePlace = async (req, res) => {
 export const deleteGuidePlace = async (req, res) => {
   try {
     const deleted = await GuidePlace.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ message: "Lieu non trouvé ❌" });
+    if (!deleted) return res.status(404).json({ message: "Lieu non trouvé " });
 
     // Supprimer les fichiers physiques
     deleted.images.forEach((img) => {
