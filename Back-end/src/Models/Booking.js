@@ -4,12 +4,12 @@ const { Schema } = mongoose;
 const bookingSchema = new Schema({
   userID: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'users',
     required: true
   },
   packID: {
     type: Schema.Types.ObjectId,
-    ref: 'TripPack',
+    ref: 'Pack',
     required: true
   },
   isCancelled: {
