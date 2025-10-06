@@ -2,6 +2,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./Config/db.js";
+import guideRoutes from "./Routes/guidePlaceRoutes.js"
 // Charger les variables d'environnement depuis .env
 dotenv.config();
 
@@ -17,6 +18,11 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send(` Serveur lancé sur le port ${port}`);
 });
+
+// Guide Place Routes
+
+// auth api
+app.use("/api/guide-places",guideRoutes)
 
 
 
