@@ -12,20 +12,7 @@ dotenv.config();
 
 const app = express();
 
-connectDB();
-
 const port = process.env.PORT || 3000;
-
-// Connect to MongoDB
-const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/test');
-        console.log('Connected to MongoDB');
-    } catch (error) {
-        console.error('MongoDB connection error:', error.message);
-        console.log('Continuing without database connection for testing...');
-    }
-};
 
 connectDB();
 
@@ -40,6 +27,7 @@ app.get("/", (req, res) => {
 
 // Routes
 //app.use('/api/packs/', packRouter);
+app.use("/api/packs", packRouter);
 app.use("/api", userRoutes);
 
 app.use(notFound);  
