@@ -18,7 +18,7 @@ function checkEndDate(endDate) {
   return true;
 }
 
-module.exports = [
+export {
     dateValidator,
     checkEndDate
-];
+};
