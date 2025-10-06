@@ -2,11 +2,6 @@ import mongoose from "mongoose";
 
 const ratingSchema = new mongoose.Schema(
   {
-    title: {
-      type: String,
-      required: [true, "rating title is required"],
-      trim: true,
-    },
     stars: {
       type: Number,
       required: [true, "stars rating is required"],
@@ -15,11 +10,8 @@ const ratingSchema = new mongoose.Schema(
     },
     comment: {
       type: String,
+      required: [true, "rating comment is required"],
       trim: true,
-    },
-    date: {
-      type: Date,
-      default: Date.now,
     },
     packID: {
       type: mongoose.Schema.Types.ObjectId,
