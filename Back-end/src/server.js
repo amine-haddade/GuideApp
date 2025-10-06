@@ -6,9 +6,12 @@ import connectDB from "./Config/db.js";
 import guideRoutes from "./Routes/guidePlaceRoutes.js"
 // Charger les variables d'environnement depuis .env
 import userRoutes from "./Routes/userRoutes.js";
+import bookingRoutes from './Routes/bookingRoutes.js';
+//import packRouter from "./Routes/packRoutes";
 import authRoutes from "./Routes/authRoutes.js";
 import {errorHandler} from "./Middlewares/errorHandler.js";
 import {notFound} from "./Middlewares/notFound.js";
+import { verifyToken } from "./Middlewares/verifyJwtToken.js";
 
 dotenv.config();
 
@@ -37,6 +40,7 @@ app.use("/api/guide-places",guideRoutes)
 app.use("/api/packs", packRouter);
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 app.use(notFound);  
 app.use(errorHandler);
