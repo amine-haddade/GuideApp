@@ -1,6 +1,6 @@
 export const authorizeRoles = (...allowedRoles) => {
   return (req, res, next) => {
-    try {
+    try {   
       const userRole = req.user?.role; // comes from verifyAccessToken middleware
 
       if (!userRole) {

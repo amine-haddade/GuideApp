@@ -10,6 +10,7 @@ import bookingRoutes from './Routes/bookingRoutes.js';
 import ratingRoutes from './Routes/ratingRoutes.js'
 import {errorHandler} from "./Middlewares/errorHandler.js";
 import {notFound} from "./Middlewares/notFound.js";
+import { verifyToken } from "./Middlewares/verifyJwtToken.js";
 
 dotenv.config();
 
