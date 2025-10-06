@@ -1,8 +1,7 @@
 import Pack from "../Models/Pack.js";
-import asyncHandler from "../Middlewares/asyncHandler.js";
 
 // Gets all the packs. Makes sure the guides get only the packs they need, which are their packs.
-const getAllPacks = asyncHandler(async (req, res) => {
+const getAllPacks = async (req, res) => {
     const options = {
         page: parseInt(req.query.page) || 1,
         limit: parseInt(req.query.limit) || 10
@@ -16,11 +15,10 @@ const getAllPacks = asyncHandler(async (req, res) => {
     }
 
     res.status(200).json(packs);
-});
+};
 
 // Create a pack. Makes sure only guides have access to this controller
-const createPack = asyncHandler(async (req, res) => {
-    console.log('User attempting to create pack:', req.user);
+const createPack = async (req, res) => {
     if (req.user.role.toLowerCase() !== 'guide') {
         return res.status(403).json({ message: 'You don\'t seem to have the right permissions to perform this action' });
     }
@@ -55,10 +53,10 @@ const createPack = asyncHandler(async (req, res) => {
 
     const savedPack = await newPack.save();
     res.status(201).json(savedPack);
-});
+};
 
 // Gets a pack by it's ID. Makes sure the guides only get access to their packs and not to other guides packs.
-const getPackById = asyncHandler(async (req, res) => {
+const getPackById = async (req, res) => {
     let pack;
     if (req.user.role.toLowerCase() === "guide") {
         pack = await Pack.findOne({ _id: req.params.id, guideId: req.user.id });
@@ -71,10 +69,10 @@ const getPackById = asyncHandler(async (req, res) => {
     }
 
     res.status(200).json(pack);
-});
+};
 
 // Update a pack. Makes sure only the owner guides have access to the pack update.
-const updatePack = asyncHandler(async (req, res) => {
+const updatePack = async (req, res) => {
     if (req.user.role.toLowerCase() !== 'guide') {
         return res.status(403).json({ message: 'You don\'t seem to have the right permissions to perform this action' });
     }
@@ -89,10 +87,10 @@ const updatePack = asyncHandler(async (req, res) => {
     }
 
     res.status(200).json(updatePack)
-})
+};
 
 // Delete a pack. Makes sure only guides have access to this controller
-const deletePack = asyncHandler(async (req, res) => {
+const deletePack = async (req, res) => {
     if (req.user.role.toLowerCase() !== 'guide') {
         return res.status(403).json({ message: 'You don\'t seem to have the right permissions to perform this action' });
     }
@@ -103,7 +101,7 @@ const deletePack = asyncHandler(async (req, res) => {
     }
 
     res.status(202).json(pack)
-});
+};
 
 export {
     getAllPacks,

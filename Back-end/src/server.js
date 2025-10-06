@@ -5,7 +5,6 @@ import cookieParser from 'cookie-parser';
 import connectDB from "./Config/db.js";
 import userRoutes from "./Routes/userRoutes.js";
 import authRoutes from "./Routes/authRoutes.js";
-import packRouter from "./Routes/packRoutes";
 import {errorHandler} from "./Middlewares/errorHandler.js";
 import {notFound} from "./Middlewares/notFound.js";
 
@@ -27,7 +26,7 @@ app.get("/", (req, res) => {
 });
 
 // Routes
-//app.use('/api/packs/', packRouter);
+// app.use('/api/packs/', packRouter);
 app.use("/api/packs", packRouter);
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
