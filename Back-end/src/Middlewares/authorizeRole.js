@@ -9,7 +9,7 @@ export const authorizeRoles = (...allowedRoles) => {
         throw error;
       }
 
-      if (!allowedRoles.includes(userRole)) {
+      if (!allowedRoles[0].includes(userRole)) {
         const error = new Error(`access denied : ${userRole} is not allowed to do this action` );
         error.statusCode = 403;
         throw error;
