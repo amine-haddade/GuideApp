@@ -64,7 +64,7 @@ export const updateGuidePlace = async (req, res) => {
         const filePath = path.resolve("uploads", img);
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
-        }
+        }    
       });
 
       // Ajouter les nouvelles images
