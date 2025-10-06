@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import packRouter from "./Routes/packRoutes.js";
 import cookieParser from 'cookie-parser';
 import connectDB from "./Config/db.js";
+import guideRoutes from "./Routes/guidePlaceRoutes.js"
+// Charger les variables d'environnement depuis .env
 import userRoutes from "./Routes/userRoutes.js";
 import authRoutes from "./Routes/authRoutes.js";
 import {errorHandler} from "./Middlewares/errorHandler.js";
@@ -25,6 +27,11 @@ app.get("/", (req, res) => {
   res.send(`Serveur lancé sur le port ${port}`);
 });
 
+// Guide Place Routes
+
+// auth api
+app.use("/api/guide-places",guideRoutes)
+
 // Routes
 // app.use('/api/packs/', packRouter);
 app.use("/api/packs", packRouter);
@@ -34,7 +41,7 @@ app.use("/api", userRoutes);
 app.use(notFound);  
 app.use(errorHandler);
 
-// Démarrer le serveur
+// Démarrer le serveur  
 app.listen(port, () => {
   console.log(`Serveur démarré sur http://localhost:${port}`);
 });
