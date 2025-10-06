@@ -16,4 +16,10 @@ export function checkEndDate(endDate) {
     return endDate >= this.startDate;
   }
   return true;
+
 }
+export {
+    dateValidator,
+    checkEndDate
+};
+

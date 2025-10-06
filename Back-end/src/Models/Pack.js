@@ -51,8 +51,7 @@ const packSchema = mongoose.Schema({
     },
     endLocation: {
         type: String,
-        required: true,
-        default: function() { return this.startLocation; }
+        required: true
     },
     avgRating: {
         type: Number,
