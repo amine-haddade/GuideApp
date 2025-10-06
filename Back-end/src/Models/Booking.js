@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const bookingSchema = new Schema({
@@ -10,11 +10,6 @@ const bookingSchema = new Schema({
   tripID: {
     type: Schema.Types.ObjectId,
     ref: 'TripPack',
-    required: true
-  },
-  confirmation_number: {
-    type: String,
-    unique: true,
     required: true
   },
   isCancelled: {
@@ -33,4 +28,4 @@ const bookingSchema = new Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Booking', bookingSchema);
+export default mongoose.model('Booking', bookingSchema);
