@@ -7,7 +7,7 @@ const bookingSchema = new Schema({
     ref: 'User',
     required: true
   },
-  tripID: {
+  packID: {
     type: Schema.Types.ObjectId,
     ref: 'TripPack',
     required: true
