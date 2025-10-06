@@ -18,8 +18,5 @@ export function checkEndDate(endDate) {
   return true;
 
 }
-export {
-    dateValidator,
-    checkEndDate
-};
+
 
