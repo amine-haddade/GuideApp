@@ -1,0 +1,1114 @@
+{
+  "info": {
+    "name": "Pack API Tests",
+    "description": "Comprehensive test collection for Pack API endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "packId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "guideToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{guideToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication Setup",
+      "item": [
+        {
+          "name": "Login as Guide",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contains token', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('token');",
+                  "    pm.collectionVariables.set('guideToken', responseJson.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"guide@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login as Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin login successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contains admin token', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('token');",
+                  "    pm.collectionVariables.set('adminToken', responseJson.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pack CRUD Operations",
+      "item": [
+        {
+          "name": "Create Pack - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pack created successfully', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response contains pack data', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('_id');",
+                  "    pm.expect(responseJson).to.have.property('title');",
+                  "    pm.expect(responseJson).to.have.property('description');",
+                  "    pm.expect(responseJson).to.have.property('price');",
+                  "    pm.expect(responseJson).to.have.property('guideId');",
+                  "    ",
+                  "    // Store pack ID for future tests",
+                  "    pm.collectionVariables.set('packId', responseJson._id);",
+                  "});",
+                  "",
+                  "pm.test('Pack has correct structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.title).to.eql('Mountain Adventure Pack');",
+                  "    pm.expect(responseJson.price).to.eql(299.99);",
+                  "    pm.expect(responseJson.availability).to.eql(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guidesPlacesId\": [\"507f1f77bcf86cd799439011\"],\n  \"title\": \"Mountain Adventure Pack\",\n  \"description\": \"An exciting mountain hiking experience with professional guides\",\n  \"price\": 299.99,\n  \"startDate\": \"2025-01-25T09:00:00.000Z\",\n  \"endDate\": \"2025-01-27T17:00:00.000Z\",\n  \"availability\": true,\n  \"startLocation\": \"Base Camp Mountain Resort\",\n  \"endLocation\": \"Summit Peak\",\n  \"maxClients\": 8\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/packs",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs"]
+            }
+          }
+        },
+
+        {
+          "name": "Create Pack - Invalid Date (Too Soon)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pack creation fails with invalid date', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error message mentions date validation', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.message).to.include('15 days in the future');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guidesPlacesId\": [\"507f1f77bcf86cd799439011\"],\n  \"title\": \"Invalid Date Pack\",\n  \"description\": \"This should fail due to invalid start date\",\n  \"price\": 199.99,\n  \"startDate\": \"2024-12-15T09:00:00.000Z\",\n  \"endDate\": \"2024-12-17T17:00:00.000Z\",\n  \"availability\": true,\n  \"startLocation\": \"Test Location\",\n  \"endLocation\": \"Test End Location\",\n  \"maxClients\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/packs",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs"]
+            }
+          }
+        },
+        {
+          "name": "Create Pack - End Date Before Start Date",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pack creation fails with invalid end date', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error message mentions end date validation', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.message).to.include('after the start date');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guidesPlacesId\": [\"507f1f77bcf86cd799439011\"],\n  \"title\": \"Invalid End Date Pack\",\n  \"description\": \"This should fail due to end date before start date\",\n  \"price\": 199.99,\n  \"startDate\": \"2025-02-15T09:00:00.000Z\",\n  \"endDate\": \"2025-02-10T17:00:00.000Z\",\n  \"availability\": true,\n  \"startLocation\": \"Test Location\",\n  \"endLocation\": \"Test End Location\",\n  \"maxClients\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/packs",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs"]
+            }
+          }
+        },
+        {
+          "name": "Create Pack - Unauthorized (Non-Guide)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pack creation forbidden for non-guide', function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "pm.test('Error message mentions permissions', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.message).to.include('permissions');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guidesPlacesId\": [\"507f1f77bcf86cd799439011\"],\n  \"title\": \"Unauthorized Pack\",\n  \"description\": \"This should fail due to wrong role\",\n  \"price\": 199.99,\n  \"startDate\": \"2025-02-15T09:00:00.000Z\",\n  \"endDate\": \"2025-02-17T17:00:00.000Z\",\n  \"availability\": true,\n  \"startLocation\": \"Test Location\",\n  \"endLocation\": \"Test End Location\",\n  \"maxClients\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/packs",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs"]
+            }
+          }
+        },
+        {
+          "name": "Get All Packs - Guide View",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Get packs successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has pagination structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('docs');",
+                  "    pm.expect(responseJson).to.have.property('totalDocs');",
+                  "    pm.expect(responseJson).to.have.property('limit');",
+                  "    pm.expect(responseJson).to.have.property('page');",
+                  "});",
+                  "",
+                  "pm.test('Packs array contains valid pack objects', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    if (responseJson.docs.length > 0) {",
+                  "        const pack = responseJson.docs[0];",
+                  "        pm.expect(pack).to.have.property('_id');",
+                  "        pm.expect(pack).to.have.property('title');",
+                  "        pm.expect(pack).to.have.property('guideId');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packs?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Packs - Admin View",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin can get all packs', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Admin sees all packs (not filtered by guide)', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('docs');",
+                  "    // Admin should potentially see more packs than a single guide",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packs",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs"]
+            }
+          }
+        },
+        {
+          "name": "Get Pack by ID - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pack retrieved successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Pack has correct ID', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson._id).to.eql(pm.collectionVariables.get('packId'));",
+                  "});",
+                  "",
+                  "pm.test('Pack contains all required fields', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('title');",
+                  "    pm.expect(responseJson).to.have.property('description');",
+                  "    pm.expect(responseJson).to.have.property('price');",
+                  "    pm.expect(responseJson).to.have.property('startDate');",
+                  "    pm.expect(responseJson).to.have.property('endDate');",
+                  "    pm.expect(responseJson).to.have.property('guideId');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packs/{{packId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs", "{{packId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Pack by ID - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pack not found returns 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Error message indicates pack not found', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.message).to.include('Pack not found');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packs/507f1f77bcf86cd799439999",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs", "507f1f77bcf86cd799439999"]
+            }
+          }
+        },
+      
+  {
+          "name": "Update Pack - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pack updated successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Updated fields are correct', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.title).to.eql('Updated Mountain Adventure Pack');",
+                  "    pm.expect(responseJson.price).to.eql(349.99);",
+                  "    pm.expect(responseJson.maxClients).to.eql(10);",
+                  "});",
+                  "",
+                  "pm.test('Pack ID remains unchanged', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson._id).to.eql(pm.collectionVariables.get('packId'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Mountain Adventure Pack\",\n  \"price\": 349.99,\n  \"maxClients\": 10,\n  \"description\": \"An updated exciting mountain hiking experience with professional guides and enhanced features\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/packs/{{packId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs", "{{packId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Pack - Unauthorized (Non-Guide)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pack update forbidden for non-guide', function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "pm.test('Error message mentions permissions', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.message).to.include('permissions');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Unauthorized Update\",\n  \"price\": 999.99\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/packs/{{packId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs", "{{packId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Pack - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Update non-existent pack returns 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Error message indicates pack not found', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.message).to.include('Pack not found');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"This should fail\",\n  \"price\": 199.99\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/packs/507f1f77bcf86cd799439999",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs", "507f1f77bcf86cd799439999"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pack Validation Tests",
+      "item": [
+        {
+          "name": "Create Pack - Missing Required Fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pack creation fails with missing fields', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error message mentions validation', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.message).to.include('required');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Incomplete Pack\",\n  \"price\": 199.99\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/packs",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs"]
+            }
+          }
+        },
+        {
+          "name": "Create Pack - Invalid Price (Negative)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pack creation fails with negative price', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error mentions price validation', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.message).to.include('price');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guidesPlacesId\": [\"507f1f77bcf86cd799439011\"],\n  \"title\": \"Negative Price Pack\",\n  \"description\": \"This should fail due to negative price\",\n  \"price\": -99.99,\n  \"startDate\": \"2025-02-15T09:00:00.000Z\",\n  \"endDate\": \"2025-02-17T17:00:00.000Z\",\n  \"availability\": true,\n  \"startLocation\": \"Test Location\",\n  \"endLocation\": \"Test End Location\",\n  \"maxClients\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/packs",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs"]
+            }
+          }
+        },
+        {
+          "name": "Create Pack - Invalid maxClients (Negative)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pack creation fails with negative maxClients', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error mentions maxClients validation', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.message).to.include('maxClients');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guidesPlacesId\": [\"507f1f77bcf86cd799439011\"],\n  \"title\": \"Negative MaxClients Pack\",\n  \"description\": \"This should fail due to negative maxClients\",\n  \"price\": 199.99,\n  \"startDate\": \"2025-02-15T09:00:00.000Z\",\n  \"endDate\": \"2025-02-17T17:00:00.000Z\",\n  \"availability\": true,\n  \"startLocation\": \"Test Location\",\n  \"endLocation\": \"Test End Location\",\n  \"maxClients\": -5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/packs",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pack Pagination Tests",
+      "item": [
+        {
+          "name": "Get Packs - Custom Pagination",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pagination works correctly', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Pagination parameters are respected', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.limit).to.eql(5);",
+                  "    pm.expect(responseJson.page).to.eql(1);",
+                  "    pm.expect(responseJson.docs.length).to.be.at.most(5);",
+                  "});",
+                  "",
+                  "pm.test('Pagination metadata is present', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('totalDocs');",
+                  "    pm.expect(responseJson).to.have.property('totalPages');",
+                  "    pm.expect(responseJson).to.have.property('hasNextPage');",
+                  "    pm.expect(responseJson).to.have.property('hasPrevPage');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packs?page=1&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Packs - Default Pagination",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Default pagination works', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Default pagination values are applied', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.limit).to.eql(10);",
+                  "    pm.expect(responseJson.page).to.eql(1);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packs",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pack Cleanup",
+      "item": [
+        {
+          "name": "Delete Pack - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pack deleted successfully', function () {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "",
+                  "pm.test('Deleted pack is returned', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson._id).to.eql(pm.collectionVariables.get('packId'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packs/{{packId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs", "{{packId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Pack - Unauthorized (Non-Guide)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pack deletion forbidden for non-guide', function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "pm.test('Error message mentions permissions', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.message).to.include('permissions');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packs/507f1f77bcf86cd799439011",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs", "507f1f77bcf86cd799439011"]
+            }
+          }
+        },
+        {
+          "name": "Delete Pack - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Delete non-existent pack returns 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Error message indicates pack not found', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.message).to.include('Pack not found');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packs/507f1f77bcf86cd799439999",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs", "507f1f77bcf86cd799439999"]
+            }
+          }
+        },
+        {
+          "name": "Verify Pack Deletion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Deleted pack is no longer accessible', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Error confirms pack not found', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson.message).to.include('Pack not found');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{guideToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packs/{{packId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["packs", "{{packId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
