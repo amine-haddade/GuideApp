@@ -5,7 +5,6 @@ import {
   getBookingsByUser,
   getBookingsByGuide,
   cancelBooking,
-  deleteBooking,
   getAllBookings
 } from '../Controllers/bookingController.js';
 import { verifyToken } from '../Middlewares/verifyJwtToken.js';
@@ -19,6 +18,5 @@ router.get('/all', verifyToken , authorizeRoles(["admin"]), getAllBookings);
 router.post('/', verifyToken, authorizeRoles(["client","admin"]), createBooking);
 router.get('/:id', verifyToken, authorizeRoles(["client" ,"guide","admin"]), getBookingById);
 router.patch('/cancel/:bookingID', verifyToken, authorizeRoles(["client","admin"]), cancelBooking);
-router.delete('/:id', verifyToken, authorizeRoles(["admin"]), deleteBooking);
 
 export default router;
