@@ -186,43 +186,6 @@ export const cancelBooking = async (req, res) => {
   }
 };
 
-
-
-
-// export const updateBooking = async (req, res) => {
-//   try {
-//     const updated = await Booking.findByIdAndUpdate(req.params.id, req.body, { new: true });
-//     if (!updated) return res.status(404).json({ message: 'Booking not found.' });
-//     res.status(200).json({ message: 'Booking updated.', booking: updated });
-//   } catch {
-//     res.status(500).json({ message: 'Server error.' });
-//   }
-// };
-
-export const deleteBooking = async (req, res) => {
-  try {
-    const { bookingID } = req.params;
-    const user = req.user; // comes from auth middleware
-
-    if (!user || user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Admins only.' });
-    }
-
-    const booking = await Booking.findById(bookingID);
-    if (!booking) {
-      return res.status(404).json({ message: 'Booking not found.' });
-    }
-
-    await Booking.findByIdAndDelete(bookingID);
-
-    res.status(200).json({ message: 'Booking deleted successfully.' });
-  } catch (error) {
-    console.error('Delete error:', error);
-    res.status(500).json({ message: 'Server error.' });
-  }
-};
-
-
 export const getAllBookings = async (req, res) => {
   try {
     const userRole = req.user?.role;
