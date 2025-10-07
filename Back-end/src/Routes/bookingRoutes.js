@@ -13,11 +13,11 @@ import { authorizeRoles } from '../Middlewares/authorizeRole.js';
 
 const router = express.Router();
 
+router.get('/guide', verifyToken, authorizeRoles(["guide","admin"]), getBookingsByGuide);
+router.get('/user', verifyToken, authorizeRoles(["client","admin"]), getBookingsByUser);
 router.get('/all', verifyToken , authorizeRoles(["admin"]), getAllBookings);
 router.post('/', verifyToken, authorizeRoles(["client","admin"]), createBooking);
 router.get('/:id', verifyToken, authorizeRoles(["client" ,"guide","admin"]), getBookingById);
-router.get('/user/:userID', verifyToken, authorizeRoles(["client","admin"]), getBookingsByUser);
-router.get('/guide/:guideID', verifyToken, authorizeRoles(["guide","admin"]), getBookingsByGuide);
 router.patch('/cancel/:bookingID', verifyToken, authorizeRoles(["client","admin"]), cancelBooking);
 router.delete('/:id', verifyToken, authorizeRoles(["admin"]), deleteBooking);
 

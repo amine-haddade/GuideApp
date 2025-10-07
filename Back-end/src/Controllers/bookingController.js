@@ -6,7 +6,8 @@ import mongoose from 'mongoose';
 
 export const createBooking = async (req, res) => {
   try {
-    const { userID, packID, isVip = false, spotsBooked = 1 } = req.body;
+    const { packID, isVip = false, spotsBooked = 1 } = req.body;
+    const userID = req.user?.id
 
     if (!userID || !packID || spotsBooked < 1) {
       return res.status(400).json({ message: 'userID, packID, and valid spotsBooked are required.' });
@@ -84,7 +85,7 @@ export const getBookingById = async (req, res) => {
 
 export const getBookingsByUser = async (req, res) => {
   try {
-    const { userID } = req.params;
+    const  userID  = req.user?.id;
     if (!mongoose.Types.ObjectId.isValid(userID)) {
       return res.status(400).json({ message: 'Invalid user ID.' });
     }
@@ -105,7 +106,7 @@ export const getBookingsByUser = async (req, res) => {
 
 export const getBookingsByGuide = async (req, res) => {
   try {
-    const { guideID } = req.params;
+    const guideID = req.user?.id;
 
     // Validate guideID format
     if (!mongoose.Types.ObjectId.isValid(guideID)) {
@@ -128,7 +129,7 @@ export const getBookingsByGuide = async (req, res) => {
       });
     }
 
-    // Adapt to schema: query using 'guideId' instead of 'guideID'
+
     const packs = await Pack.find({ guideId: guideID });
     const packIDs = packs.map(pack => pack._id);
 
@@ -159,17 +160,22 @@ export const getBookingsByGuide = async (req, res) => {
 export const cancelBooking = async (req, res) => {
   try {
     const { bookingID } = req.params;
-    const userID = req.user._id; // comes from auth middleware
+    const userID = req.user?.id;
 
-    const booking = await Booking.findById(bookingID);
+    // Retrieve the booking and ensure userID is populated
+    const booking = await Booking.findById(bookingID).populate('userID');
+
+    // Check if the booking exists and is not cancelled
     if (!booking || booking.isCancelled) {
       return res.status(404).json({ message: 'Booking not found or already cancelled.' });
     }
-
-    if (booking.userID.toString() !== userID.toString()) {
+    // Check if userID exists and compare
+    const bookingUserId = booking.userID?._id ? booking.userID._id.toString() : booking.userID.toString();
+    if (bookingUserId !== userID) {
       return res.status(403).json({ message: 'You can only cancel your own bookings.' });
     }
-
+    console.log('Booking:', booking);
+    // Proceed to cancel the booking
     booking.isCancelled = true;
     await booking.save();
 
@@ -179,6 +185,8 @@ export const cancelBooking = async (req, res) => {
     res.status(500).json({ message: 'Server error.' });
   }
 };
+
+
 
 
 // export const updateBooking = async (req, res) => {
