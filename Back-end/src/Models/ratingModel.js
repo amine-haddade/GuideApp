@@ -20,7 +20,7 @@ const ratingSchema = new mongoose.Schema(
     },
     clientID: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "users",
       required: [true, "client ID is required"],
     },
   },
