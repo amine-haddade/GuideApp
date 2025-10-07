@@ -9,10 +9,10 @@ const bookingSchema = new Schema({
   },
   packID: {
     type: Schema.Types.ObjectId,
-    ref: 'Pack',
+    ref: 'pack',
     required: true
   },
-  isVip: {
+  isVip: {   
     type: Boolean,
     default: false
   },

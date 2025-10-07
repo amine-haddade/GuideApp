@@ -6,8 +6,8 @@ import mongoose from 'mongoose';
 
 export const createBooking = async (req, res) => {
   try {
-    const { userID, packID, isVip = false, spotsBooked = 1 } = req.body;
-
+    const {  packID, isVip = false, spotsBooked = 1 } = req.body;
+    const userID = req.user?.id
     if (!userID || !packID || spotsBooked < 1) {
       return res.status(400).json({ message: 'userID, packID, and valid spotsBooked are required.' });
     }

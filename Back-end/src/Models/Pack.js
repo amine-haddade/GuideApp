@@ -63,5 +63,8 @@ const packSchema = mongoose.Schema({
     }
 });
 
-packSchema.plugin(mongoosePaginate);
-export default mongoose.model('Pack', packSchema, 'pack');
+
+
+const Pack = mongoose.model("pack", packSchema,"pack");
+export default Pack
+
