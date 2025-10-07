@@ -19,7 +19,12 @@ const signUp = async (req, res, next) => {
     newUser.password = await bcrypt.hash(newUser.password, 10);
     const user = await User.create(newUser);
 
-    next();
+    const { password, refreshToken, ...userData } = user.toObject();
+
+    res.status(200).json({
+      success: true,
+      user: userData,
+    });
   } catch (err) {
     next(err);
   }

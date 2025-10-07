@@ -11,7 +11,7 @@ import { verifyToken } from "../Middlewares/verifyJwtToken.js";
 
 const router = express.Router();
 
-router.post("/signup", createUserValidation, validate, signUp, login);
+router.post("/signup", createUserValidation, validate, signUp);
 router.post("/login", login);
 router.post("/refresh", refreshAccessToken);
 router.post("/logout", verifyToken, logout);
