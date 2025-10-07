@@ -21,3 +21,12 @@ export const addRatingValidation = [
     .custom((value) => mongoose.Types.ObjectId.isValid(value))
     .withMessage("pack ID must be a valid ObjectId"),
 ];
+
+export const updateRatingValidation = [
+  body("stars")
+    .notEmpty()
+    .withMessage("stars rating is required")
+    .isInt({ min: 1, max: 5 })
+    .withMessage("stars must be a number between 1 and 5")
+    .escape(),
+];

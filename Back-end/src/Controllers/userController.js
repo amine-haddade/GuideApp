@@ -45,6 +45,17 @@ const updateUser = async (req, res, next) => {
       throw error;
     }
 
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+    if (
+      ["client", "guide"].includes(userRole) &&
+      user._id.toString() !== userId
+    ) {
+      const error = new Error("not allowed to update other " + user.role);
+      error.statusCode = 404;
+      throw error;
+    }
+
     if (update.email) {
       update.email = update.email.toLowerCase();
     }
@@ -91,6 +102,17 @@ const deleteUserById = async (req, res, next) => {
       throw error;
     }
 
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+    if (
+      ["client", "guide"].includes(userRole) &&
+      user._id.toString() !== userId
+    ) {
+      const error = new Error("not allowed to delete other " + user.role);
+      error.statusCode = 404;
+      throw error;
+    }
+
     if (user.isDeleted) {
       const error = new Error("user already deleted");
       error.statusCode = 400;
@@ -101,11 +123,16 @@ const deleteUserById = async (req, res, next) => {
     user.deletedAt = new Date();
     await user.save();
 
-    res.status(200).json({
-      success: true,
-      message: "user soft-deleted successfully",
-      user,
-    });
+    // Check if the logged-in client delete himself
+    if (user._id.toString() === userId) {
+      next();
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "user soft-deleted successfully",
+        user,
+      });
+    }
   } catch (err) {
     next(err);
   }
