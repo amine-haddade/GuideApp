@@ -129,13 +129,34 @@ export const getBookingsByGuide = async (req, res) => {
 
 export const updateBooking = async (req, res) => {
   try {
-    const updated = await Booking.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updated) return res.status(404).json({ message: 'Booking not found.' });
-    res.status(200).json({ message: 'Booking updated.', booking: updated });
-  } catch {
-    res.status(500).json({ message: 'Server error.' });
+    const { id } = req.params;
+    const { isCancelled, isCompleted } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid booking ID.' });
+    }
+
+    const booking = await Booking.findById(id);
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found.' });
+    }
+
+    if (typeof isCancelled !== 'undefined') booking.isCancelled = isCancelled;
+    if (typeof isCompleted !== 'undefined') booking.isCompleted = isCompleted;
+
+    await booking.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Booking updated successfully.',
+      data: booking
+    });
+  } catch (error) {
+    console.error('Update booking error:', error);
+    res.status(500).json({ message: 'Internal server error.' });
   }
 };
+
 
 export const deleteBooking = async (req, res) => {
   try {
