@@ -5,16 +5,20 @@ import {
   getBookingsByUser,
   getBookingsByGuide,
   cancelBooking,
-  deleteBooking
+  deleteBooking,
+  getAllBookings
 } from '../Controllers/bookingController.js';
+import { verifyToken } from '../Middlewares/verifyJwtToken.js';
+import { authorizeRoles } from '../Middlewares/authorizeRole.js';
 
 const router = express.Router();
 
-router.post('/', createBooking);
-router.get('/:id', getBookingById);
-router.get('/user/:userID', getBookingsByUser);
-router.get('/guide/:guideID', getBookingsByGuide);
-router.patch('/cancel/:bookingID', cancelBooking);
-router.delete('/:id', deleteBooking);
+router.get('/all', verifyToken , authorizeRoles(["admin"]), getAllBookings);
+router.post('/', verifyToken, authorizeRoles(["client","admin"]), createBooking);
+router.get('/:id', verifyToken, authorizeRoles(["client" ,"guide","admin"]), getBookingById);
+router.get('/user/:userID', verifyToken, authorizeRoles(["client","admin"]), getBookingsByUser);
+router.get('/guide/:guideID', verifyToken, authorizeRoles(["guide","admin"]), getBookingsByGuide);
+router.patch('/cancel/:bookingID', verifyToken, authorizeRoles(["client","admin"]), cancelBooking);
+router.delete('/:id', verifyToken, authorizeRoles(["admin"]), deleteBooking);
 
 export default router;

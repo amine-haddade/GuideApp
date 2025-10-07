@@ -213,3 +213,28 @@ export const deleteBooking = async (req, res) => {
     res.status(500).json({ message: 'Server error.' });
   }
 };
+
+
+export const getAllBookings = async (req, res) => {
+  try {
+    const userRole = req.user?.role;
+
+    if (userRole !== 'admin') {
+      return res.status(403).json({ message: 'Access denied. Admins only.' });
+    }
+
+    const bookings = await Booking.find()
+      .populate('userID', 'name email role')     // show user info
+      .populate('packID', 'title location date') // show pack info
+
+    res.status(200).json({
+      success: true,
+      message: 'All bookings retrieved successfully.',
+      count: bookings.length,
+      data: bookings
+    });
+  } catch (error) {
+    console.error('Get all bookings error:', error);
+    res.status(500).json({ message: 'Server error.' });
+  }
+};
