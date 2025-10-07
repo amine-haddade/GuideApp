@@ -4,7 +4,7 @@ import {
   getBookingById,
   getBookingsByUser,
   getBookingsByGuide,
-  updateBooking,
+  cancelBooking,
   deleteBooking
 } from '../Controllers/bookingController.js';
 
@@ -14,7 +14,7 @@ router.post('/', createBooking);
 router.get('/:id', getBookingById);
 router.get('/user/:userID', getBookingsByUser);
 router.get('/guide/:guideID', getBookingsByGuide);
-router.patch('/:id', updateBooking);
+router.patch('/cancel/:bookingID', cancelBooking);
 router.delete('/:id', deleteBooking);
 
 export default router;
