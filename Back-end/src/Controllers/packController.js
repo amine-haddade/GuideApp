@@ -2,7 +2,7 @@ import Pack from "../Models/Pack.js";
 
 // Gets all the packs. Makes sure the guides get only the packs they need, which are their packs.
 const getAllPacks = async (req, res) => {
-    try {
+    try {  
         const options = {
             page: parseInt(req.query.page) || 1,
             limit: parseInt(req.query.limit) || 10
