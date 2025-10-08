@@ -4,10 +4,11 @@ import { verifyToken } from "../Middlewares/verifyJwtToken.js";
 import { authorizeRoles } from "../Middlewares/authorizeRole.js";
 import { addRatingValidation, updateRatingValidation } from "../Validations/ratingValidator.js";
 import { validate } from "../Middlewares/userValidate.js";
+import { requireProfileCompletion } from "../Middlewares/requireProfileFields.js";
 
 const router = express.Router();
 
-router.post('/rating', verifyToken, authorizeRoles(["client"]), addRatingValidation, validate, addRating)
+router.post('/rating', verifyToken, authorizeRoles(["client"]), requireProfileCompletion, addRatingValidation, validate, addRating)
 router.put('/rating/:id', verifyToken, authorizeRoles(["client"]), updateRatingValidation, validate, updateRating)
 router.delete('/rating/:id', verifyToken, authorizeRoles(["admin"]), deleteRating)
 router.get('/rating/:packId', verifyToken, authorizeRoles(["admin", "client","guide"]), getRatingsByPack)
