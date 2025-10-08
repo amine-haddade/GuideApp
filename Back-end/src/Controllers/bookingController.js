@@ -6,8 +6,7 @@ import mongoose from 'mongoose';
 
 export const createBooking = async (req, res) => {
   try {
-    const {  packID, isVip = false, spotsBooked = 1 } = req.body;
-    const userID = req.user?.id
+
     const { packID, isVip = false, spotsBooked = 1 } = req.body;
     const userID = req.user?.id
 
