@@ -32,21 +32,6 @@ export const createUserValidation = [
     .isIn(["client", "guide", "admin"])
     .withMessage("role must be client, guide or admin")
     .escape(),
-
-  body("phone")
-    .trim()
-    .notEmpty()
-    .withMessage("phone number is required")
-    .isMobilePhone("any")
-    .withMessage("please add a valid phone number")
-    .escape(),
-
-  body("cin")
-    .if((value, { req }) => req.body.role === "guide")
-    .trim()
-    .notEmpty()
-    .withMessage("cin is required")
-    .escape(),
 ];
 
 export const updateUserValidation = [
@@ -88,7 +73,7 @@ export const updateUserValidation = [
   body("cin")
     .optional()
     .trim()
-    .if(body("role").equals("guide"))
+    .if((value, { req }) => req.user?.role === "guide")
     .escape(),
 ];
 

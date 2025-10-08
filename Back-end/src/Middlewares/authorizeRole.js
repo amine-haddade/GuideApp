@@ -14,7 +14,6 @@ export const authorizeRoles = (...allowedRoles) => {
         error.statusCode = 403;
         throw error;
       }
-
       next();
     } catch (error) {
       next(error);

@@ -58,19 +58,33 @@ const updateUser = async (req, res, next) => {
 
     if (update.email) {
       update.email = update.email.toLowerCase();
+      const existingUser = await User.findOne({ email: update.email });
+      if (existingUser) {
+        const error = new Error("email already exists");
+        error.statusCode = 400;
+        throw error;
+      }
     }
 
     if (update.name) {
       update.name = update.name.toLowerCase();
     }
 
-    delete update.refreshToken;
+    if (update.phone) {
+      const existingPhone = await User.findOne({ phone: update.phone });
+      if (existingPhone) {
+        const error = new Error("phone already exists");
+        error.statusCode = 400;
+        throw error;
+      }
+    }
 
     if (update.password) {
       update.password = await bcrypt.hash(update.password, 10);
-    } else {
-      delete update.password;
     }
+
+    delete update.refreshToken;
+    delete update.cin;
 
     const updatedUser = await User.findByIdAndUpdate(
       id,
@@ -236,6 +250,8 @@ const getAllUsers = async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: users.length,
+      page: pageNum,
+      limit: limitNum,
       users,
     });
   } catch (err) {
