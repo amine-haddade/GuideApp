@@ -26,6 +26,7 @@ export const createBooking = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found or has been deleted.' });
     }
+    
 
     const existingBookings = await Booking.find({ packID, isCancelled: false });
 
