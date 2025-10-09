@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const bookingSchema = new Schema({
   userID: {
     type: Schema.Types.ObjectId,
-    ref: 'users',
+    ref: 'User',
     required: true
   },
   packID: {

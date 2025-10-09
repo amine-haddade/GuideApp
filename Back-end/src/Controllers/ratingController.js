@@ -1,4 +1,4 @@
-import Rating from "../Models/ratingModel.js";
+import Rating from "../Models/Rating.js";
 import Pack from "../Models/Pack.js";
 import mongoose from "mongoose";
 
