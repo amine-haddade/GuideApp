@@ -1,4 +1,4 @@
-import Rating from "../Models/ratingModel.js";
+import Rating from "../Models/Rating.js";
 import Pack from "../Models/Pack.js";
 import mongoose from "mongoose";
 
@@ -143,6 +143,8 @@ export const getAllRatings = async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: ratings.length,
+      page : pageNum,
+      limit : limitNum,
       data: ratings,
     });
   } catch (err) {
@@ -183,6 +185,8 @@ export const getRatingsByPack = async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: ratings.length,
+      page : pageNum,
+      limit : limitNum,
       ratings: ratings,
     });
   } catch (err) {

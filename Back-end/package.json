@@ -1,15 +1,15 @@
 {
   "name": "back-end",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend API for booking system",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["booking", "api", "express", "mongoose"],
+  "author": "Saad",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.2",

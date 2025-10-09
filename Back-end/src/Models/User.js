@@ -29,14 +29,12 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: [true, "phone number is required"],
+      unique: true,
       trim: true,
     },
     cin: {
       type: String,
-      required: function () {
-        return this.role === "guide";
-      },
+      unique: true,
     },
     refreshToken: {
       type: String,
@@ -54,5 +52,5 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const User = mongoose.model("users", userSchema);
+const User = mongoose.model("User", userSchema);
 export default User;
