@@ -10,7 +10,7 @@ const packSchema = mongoose.Schema({
     },
     guidesPlacesId: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Guide',
+        ref: 'Guideplace',
         required: true
     }],
     title: {
@@ -66,7 +66,7 @@ const packSchema = mongoose.Schema({
 
 
 packSchema.plugin(mongoosePaginate);
-export default mongoose.model('Pack', packSchema,);   
 
 
-    
+export default mongoose.model('Pack', packSchema);
+

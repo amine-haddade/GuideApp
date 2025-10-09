@@ -1,5 +1,5 @@
 // controllers/guidePlaceController.js
-import GuidePlace from "../Models/Guide.js";
+import GuidePlace from "../Models/Guideplace.js";
 import fs from "fs";
 import path from "path";
 

@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
-import User from "../Models/userModel.js";
+import User from "../Models/User.js";
 
 // Add New User
 const addUser = async (req, res, next) => {
