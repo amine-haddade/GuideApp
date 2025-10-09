@@ -63,5 +63,11 @@ const packSchema = mongoose.Schema({
     }
 });
 
+
+
+
 packSchema.plugin(mongoosePaginate);
+
+
 export default mongoose.model('Pack', packSchema);
+
