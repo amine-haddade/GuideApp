@@ -9,7 +9,7 @@ const bookingSchema = new Schema({
   },
   packID: {
     type: Schema.Types.ObjectId,
-    ref: 'pack',
+    ref: 'Pack',
     required: true
   },
   isVip: {   
