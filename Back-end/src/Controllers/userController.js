@@ -45,21 +45,46 @@ const updateUser = async (req, res, next) => {
       throw error;
     }
 
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+    if (
+      ["client", "guide"].includes(userRole) &&
+      user._id.toString() !== userId
+    ) {
+      const error = new Error("not allowed to update other " + user.role);
+      error.statusCode = 404;
+      throw error;
+    }
+
     if (update.email) {
       update.email = update.email.toLowerCase();
+      const existingUser = await User.findOne({ email: update.email });
+      if (existingUser) {
+        const error = new Error("email already exists");
+        error.statusCode = 400;
+        throw error;
+      }
     }
 
     if (update.name) {
       update.name = update.name.toLowerCase();
     }
 
-    delete update.refreshToken;
+    if (update.phone) {
+      const existingPhone = await User.findOne({ phone: update.phone });
+      if (existingPhone) {
+        const error = new Error("phone already exists");
+        error.statusCode = 400;
+        throw error;
+      }
+    }
 
     if (update.password) {
       update.password = await bcrypt.hash(update.password, 10);
-    } else {
-      delete update.password;
     }
+
+    delete update.refreshToken;
+    delete update.cin;
 
     const updatedUser = await User.findByIdAndUpdate(
       id,
@@ -91,6 +116,17 @@ const deleteUserById = async (req, res, next) => {
       throw error;
     }
 
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+    if (
+      ["client", "guide"].includes(userRole) &&
+      user._id.toString() !== userId
+    ) {
+      const error = new Error("not allowed to delete other " + user.role);
+      error.statusCode = 404;
+      throw error;
+    }
+
     if (user.isDeleted) {
       const error = new Error("user already deleted");
       error.statusCode = 400;
@@ -101,11 +137,16 @@ const deleteUserById = async (req, res, next) => {
     user.deletedAt = new Date();
     await user.save();
 
-    res.status(200).json({
-      success: true,
-      message: "user soft-deleted successfully",
-      user,
-    });
+    // Check if the logged-in client delete himself
+    if (user._id.toString() === userId) {
+      next();
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "user soft-deleted successfully",
+        user,
+      });
+    }
   } catch (err) {
     next(err);
   }
@@ -209,6 +250,8 @@ const getAllUsers = async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: users.length,
+      page: pageNum,
+      limit: limitNum,
       users,
     });
   } catch (err) {

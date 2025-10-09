@@ -5,21 +5,63 @@ import User from "../Models/userModel.js";
 // Sign Up User
 const signUp = async (req, res, next) => {
   try {
-    const newUser = { ...req.body };
-    newUser.email = newUser.email.toLowerCase();
-    newUser.name = newUser.name.toLowerCase();
+    const { name, email, password, role } = req.body;
+    email.toLowerCase();
+    name.toLowerCase();
 
-    const existingUser = await User.findOne({ email: newUser.email });
+    const existingUser = await User.findOne({ email: email });
     if (existingUser) {
       const error = new Error("email already exists");
       error.statusCode = 400;
       throw error;
     }
 
-    newUser.password = await bcrypt.hash(newUser.password, 10);
-    const user = await User.create(newUser);
+    const hashedPwd = await bcrypt.hash(password, 10);
 
-    next();
+    const newUser = { name, email, password: hashedPwd, role };
+    await User.create(newUser);
+
+    res.status(200).json({
+      success: true,
+      user: { name, email, role },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Update Profile
+const updateProfile = async (req, res, next) => {
+  try {
+    const { phone, cin } = req.body;
+    const updates = {};
+
+    if (phone) {
+      const existingPhone = await User.findOne({ phone });
+      if (existingPhone) {
+        const error = new Error("phone already exists");
+        error.statusCode = 400;
+        throw error;
+      }
+      updates.phone = phone;
+    }
+
+    if (cin && req.user?.role === "guide") {
+      const existingCin = await User.findOne({ cin });
+      if (existingCin) {
+        const error = new Error("cin already exists");
+        error.statusCode = 400;
+        throw error;
+      }
+      updates.cin = cin;
+    }
+
+    const user = await User.findByIdAndUpdate(req.user.id, updates, {
+      new: true,
+      runValidators: true,
+    }).select("-password -refreshToken");
+
+    res.status(200).json({ success: true, user });
   } catch (err) {
     next(err);
   }
@@ -106,7 +148,7 @@ const refreshAccessToken = async (req, res, next) => {
 
     const user = await User.findById(decoded.id);
 
-    if (!user || user.refreshToken !== refreshToken){
+    if (!user || user.refreshToken !== refreshToken) {
       const error = new Error("no refresh token provided");
       error.statusCode = 403;
       throw error;
@@ -172,4 +214,4 @@ const logout = async (req, res, next) => {
   }
 };
 
-export { signUp, login, logout, refreshAccessToken };
+export { signUp, login, logout, refreshAccessToken, updateProfile };
