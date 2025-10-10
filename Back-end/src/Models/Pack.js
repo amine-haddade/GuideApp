@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
-import { dateValidator, checkEndDate } from "../Validations/packValidator.js";
+import { dateValidator, checkEndDate } from "../utils/jwt.js";
 
 const packSchema = mongoose.Schema({
     guideId: {
