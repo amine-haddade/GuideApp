@@ -16,10 +16,11 @@ export const createGuidePlace = async (req, res) => {
     const data = {
       ...req.body,
       images: imageNames,
+      guideID: req.user.id
     };
-
+   
     const newPlace = await GuidePlace.create(data);
-    res.status(201).json({ message: "Lieu créé avec succès ", data: newPlace });
+    res.status(201).json({ message: "Lieu créé avec succès "});
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur ", error: error.message });
   }
@@ -49,10 +50,14 @@ export const getGuidePlaceById = async (req, res) => {
 //  Mettre à jour un lieu (avec images optionnelles)
 export const updateGuidePlace = async (req, res) => {
   try {
-    // 1. Récupérer le lieu existant
-    const existingPlace = await GuidePlace.findById(req.params.id);
+    // 1. Récupérer le lieu existant avec vérification du guideID
+    const existingPlace = await GuidePlace.findOne({
+      _id: req.params.id,
+      guideID: req.user.id  // Vérifier que le lieu appartient au guide connecté
+    });
+
     if (!existingPlace) {
-      return res.status(404).json({ message: "Lieu non trouvé" });
+      return res.status(404).json({ message: "Lieu non trouvé ou vous n'avez pas les droits pour le modifier" });
     }
 
     let updatedData = { ...req.body };
@@ -71,23 +76,25 @@ export const updateGuidePlace = async (req, res) => {
       updatedData.images = req.files.map(file => file.filename);
     }
 
-    // 3. Mettre à jour le document
-    const updated = await GuidePlace.findByIdAndUpdate(
-      req.params.id,
+    // 3. Mettre à jour le document en vérifiant le guideID
+    const updated = await GuidePlace.findOneAndUpdate(
+      { 
+        _id: req.params.id,
+        guideID: req.user.id  // S'assurer que seul le propriétaire peut modifier
+      },
       updatedData,
       {
-        new: true,
         runValidators: true,
+
       }
     );
 
     res.json({ 
       message: "Lieu mis à jour avec succès",
-      data: updated 
     });
   } catch (error) {
     res.status(500).json({ 
-      message: "Erreur serveur", 
+      message: "Erreur serveur",                
       error: error.message 
     });
   }

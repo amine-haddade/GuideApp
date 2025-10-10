@@ -1,9 +1,5 @@
 // middlewares/requireProfileFields.js
-<<<<<<< HEAD
-import User from "../Models/userModel.js";
-=======
 import User from "../Models/User.js";
->>>>>>> d724b11b6592a46013c89327618c5f9f825467ad
 
 export const requireProfileCompletion = async (req, res, next) => {
   try {
