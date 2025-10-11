@@ -2,6 +2,7 @@ import { body } from "express-validator";
 
 export const updateProfileValidation = [
   body("phone")
+    .if((value, { req }) => req.user?.role === "guide")
     .trim()
     .notEmpty()
     .withMessage("phone number is required")

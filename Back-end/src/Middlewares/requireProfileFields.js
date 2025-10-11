@@ -17,8 +17,6 @@ export const requireProfileCompletion = async (req, res, next) => {
     if (user.role === "guide") {
       if (!user.phone) missingFields.push("phone");
       if (!user.cin) missingFields.push("cin");
-    } else if (user.role === "client") {
-      if (!user.phone) missingFields.push("phone");
     }
 
     if (missingFields.length > 0) {
