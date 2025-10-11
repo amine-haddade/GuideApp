@@ -7,7 +7,6 @@ export const createGuidePlaceSchema = z.object({
   location: z.string().nonempty("La localisation est obligatoire"),
   city: z.string().nonempty("La ville est obligatoire"),
   country: z.string().nonempty("Le pays est obligatoire"),
-  guideID: z.string().nonempty("guideID est obligatoire"),
 });
 
 export const updateGuidePlaceSchema = z.object({
@@ -16,5 +15,4 @@ export const updateGuidePlaceSchema = z.object({
   location: z.string().optional(),
   city: z.string().optional(),
   country: z.string().optional(),
-  guideID: z.string().optional(),
 });

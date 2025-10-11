@@ -12,7 +12,7 @@ const bookingSchema = new Schema({
     ref: 'Pack',
     required: true
   },
-  isVip: {
+  isVip: {   
     type: Boolean,
     default: false
   },
