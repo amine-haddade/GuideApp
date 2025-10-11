@@ -6,10 +6,13 @@ import User from "../Models/User.js";
 const signUp = async (req, res, next) => {
   try {
     const { name, email, password, role } = req.body;
-    email.toLowerCase();
-    name.toLowerCase();
+    const validEmail = email.toLowerCase();
+    const validName = name.toLowerCase();
+    const validRole = role.toLowerCase();
 
-    const existingUser = await User.findOne({ email: email });
+    console.log(email);
+
+    const existingUser = await User.findOne({ email: validEmail });
     if (existingUser) {
       const error = new Error("email already exists");
       error.statusCode = 400;
@@ -18,12 +21,17 @@ const signUp = async (req, res, next) => {
 
     const hashedPwd = await bcrypt.hash(password, 10);
 
-    const newUser = { name, email, password: hashedPwd, role };
+    const newUser = {
+      name: validName,
+      email: validEmail,
+      password: hashedPwd,
+      role: validRole,
+    };
     await User.create(newUser);
 
     res.status(200).json({
       success: true,
-      user: { name, email, role },
+      message : `${newUser.role} successfuly signed up`
     });
   } catch (err) {
     next(err);
@@ -34,6 +42,7 @@ const signUp = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
   try {
     const { phone, cin } = req.body;
+
     const updates = {};
 
     if (phone) {
@@ -58,10 +67,10 @@ const updateProfile = async (req, res, next) => {
 
     const user = await User.findByIdAndUpdate(req.user.id, updates, {
       new: true,
-      runValidators: true,
-    }).select("-password -refreshToken");
+      runValidators: true
+    })
 
-    res.status(200).json({ success: true, user });
+    res.status(200).json({ success: true, message: `${user.role} successfuly updated` });
   } catch (err) {
     next(err);
   }
@@ -123,11 +132,9 @@ const login = async (req, res, next) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    const { password: pw, refreshToken, ...userData } = user.toObject();
-
     res.status(200).json({
       success: true,
-      user: userData,
+      message: `${user.role} successfuly logged in`,
     });
   } catch (error) {
     next(error);
